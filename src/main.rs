@@ -1,4 +1,4 @@
-use num::bigint::{BigInt, ToBigInt};
+use num::bigint::{self, BigInt, ToBigInt};
 use num::traits::{One, Zero};
 fn main() {
     let a = BigInt::parse_bytes(b"96557807278640299121519463045206377934978887298086994211590515571717325955785923783159432436307870512742354877476790046891802153053719263845602618422474671707896136814707875793300040916757228826108499490311295942553478010913043680523612655400526255290702983490382191419067057726624348815391509161304477322782",10);
@@ -33,6 +33,8 @@ fn main() {
     ];
     let (b, m) = crt(&v);
     println!("{}mod{}", b, m);
+    let p = BigInt::parse_bytes(b"8123641848146819461941469161168273481264121", 10).unwrap();
+    println!("{}", miller_rabin(&p));
 }
 fn gcd(a: &BigInt, b: &BigInt) -> BigInt {
     return if (*b).is_zero() {
@@ -103,4 +105,32 @@ fn crt(ls: &Vec<[BigInt; 2]>) -> (BigInt, BigInt) {
         x = (x.clone() + &ms[i][1] * &es[i] * &ls[i][1]) % &m;
     }
     return (x, m);
+}
+fn miller_rabin(p: &BigInt) -> (bool) {
+    let two = ToBigInt::to_bigint(&2).unwrap();
+    if p < &ToBigInt::to_bigint(&3).unwrap() {
+        return p == &two;
+    }
+    let random_times = 10;
+    let mut q = p - BigInt::one();
+    let mut t = 0;
+    while q % two == BigInt::zero() {
+        q = q / two;
+        t += 1;
+    }
+    for i in 0..random_times {
+        let a = bigint::RandBigInt::gen_bigint_range(BigInt::one(), p - &BigInt::one());
+        let mut v = fast_pow(&a, &q, &p);
+        if v == BigInt::one() || v == p - BigInt::one() {
+            continue;
+        }
+        for j in 0..t + 1 {
+            v = v * v % p;
+            if v == p - BigInt::one() {
+                break;
+            }
+        }
+        return false;
+    }
+    return true;
 }
