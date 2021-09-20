@@ -8,4 +8,4 @@ What we implement are:
 - Fast Pow
 - Miller-Rabin Test
   
-Now we still do not implement Miller-Rabin test. We will implement it soon.
+Now we are implementing Miller-Rabin test. We will implement it soon. There're still bugs there.
